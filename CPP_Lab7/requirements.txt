@@ -1,0 +1,5 @@
+behave==1.2.6
+selenium==4.24.0
+webdriver-manager==4.0.2
+behave-html-formatter==0.9.10
+requests==2.32.3

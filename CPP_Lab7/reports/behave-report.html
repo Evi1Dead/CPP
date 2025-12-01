@@ -1,0 +1,179 @@
+Feature: Google Search baseline (Variants 1-3) # features/google_search.feature:1
+  To satisfy Lab 7 we automate the Variant 1, Variant 2, and Variant 3 checks for
+  Google Search using Cucumber BDD, Selenium, and Chrome.
+  Background:   # features/google_search.feature:5
+
+  @variant1 @smoke
+  Scenario: Page opens with key widgets present  # features/google_search.feature:9
+    Given I open the Google home page            # features/steps/navigation_steps.py:14
+    Then the page title should contain "Google"  # features/steps/navigation_steps.py:20
+    And the following elements should be visible # features/steps/navigation_steps.py:26
+      | name              | locator_key        |
+      | Search box        | home.search_box    |
+      | Google Search btn | home.search_button |
+      | Lucky button      | home.feeling_lucky |
+    And the Google logo should be displayed      # features/steps/navigation_steps.py:36
+      Traceback (most recent call last):
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/behave/model.py", line 1329, in run
+          match.run(runner.context)
+          ~~~~~~~~~^^^^^^^^^^^^^^^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/behave/matchers.py", line 98, in run
+          self.func(context, *args, **kwargs)
+          ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "features/steps/navigation_steps.py", line 38, in step_logo_visible
+          logo = wait_for_visibility(context.browser, "home.logo")
+        File "/home/kali/Documents/CPP_Lab7/features/support/helpers.py", line 25, in wait_for_visibility
+          return WebDriverWait(driver, timeout).until(EC.visibility_of_element_located(locator))
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/selenium/webdriver/support/wait.py", line 105, in until
+          raise TimeoutException(message, screen, stacktrace)
+      selenium.common.exceptions.TimeoutException: Message: 
+      Stacktrace:
+      #0 0x55a243434fba <unknown>
+      #1 0x55a242eb96d0 <unknown>
+      #2 0x55a242f0b2aa <unknown>
+      #3 0x55a242f0b541 <unknown>
+      #4 0x55a242f596c4 <unknown>
+      #5 0x55a242f30e5d <unknown>
+      #6 0x55a242f56b54 <unknown>
+      #7 0x55a242f30c03 <unknown>
+      #8 0x55a242efd7a8 <unknown>
+      #9 0x55a242efe421 <unknown>
+      #10 0x55a2433f9b28 <unknown>
+      #11 0x55a2433fd87f <unknown>
+      #12 0x55a2433e1c49 <unknown>
+      #13 0x55a2433fe405 <unknown>
+      #14 0x55a2433c74ff <unknown>
+      #15 0x55a243422258 <unknown>
+      #16 0x55a243422432 <unknown>
+      #17 0x55a243433fa3 <unknown>
+      #18 0x7fc9073ceb7b <unknown>
+
+
+  @variant1
+  Scenario: Count search results per page               # features/google_search.feature:19
+    Given I open the Google home page                   # features/steps/navigation_steps.py:14
+    When I search for "test automation"                 # features/steps/search_steps.py:16
+    Then at least 8 organic results should be shown     # features/steps/search_steps.py:32
+      Assertion Failed: Google results container never rendered.
+
+    And no more than 12 organic results should be shown # None
+
+  @variant1
+  Scenario: Blank submission should not trigger results  # features/google_search.feature:25
+    Given I open the Google home page                    # features/steps/navigation_steps.py:14
+    When I submit an empty query                         # features/steps/search_steps.py:57
+    Then I should remain on the Google home page         # features/steps/search_steps.py:65
+    And no results section should be visible             # features/steps/search_steps.py:73
+
+  @variant1
+  Scenario: Typo search suggests a "Did you mean" correction  # features/google_search.feature:31
+    Given I open the Google home page                         # features/steps/navigation_steps.py:14
+    When I search for "gogle tutorial"                        # features/steps/search_steps.py:16
+    Then the "Did you mean" suggestion should be visible      # features/steps/search_steps.py:84
+      Assertion Failed: Expected 'Did you mean' suggestion, but none appeared.
+
+
+  @variant2
+  Scenario: Gibberish query shows no matches                                # features/google_search.feature:36
+    Given I open the Google home page                                       # features/steps/navigation_steps.py:14
+    When I search for "++++++"                                              # features/steps/search_steps.py:16
+    Then I should see a no results message explaining there were no matches # features/steps/advanced_search_steps.py:17
+      Assertion Failed: Expected a 'did not match any documents' style message for gibberish query.
+
+
+  @variant2
+  Scenario: Accepting a suggestion updates the query and results  # features/google_search.feature:41
+    Given I open the Google home page                             # features/steps/navigation_steps.py:14
+    When I search for "gogle"                                     # features/steps/search_steps.py:16
+    And I accept the suggested correction                         # features/steps/advanced_search_steps.py:32
+      Assertion Failed: No 'Did you mean' link was available to click.
+
+    Then the search box should contain "google"                   # None
+    And at least 5 organic results should be shown                # None
+
+  @variant2
+  Scenario: Autocomplete suggestions appear for partial keywords      # features/google_search.feature:48
+    Given I open the Google home page                                 # features/steps/navigation_steps.py:14
+    When I type "Tehnical" into the search box without submitting     # features/steps/advanced_search_steps.py:57
+    Then I should see autocomplete suggestions containing "technical" # features/steps/advanced_search_steps.py:66
+
+  @variant3
+  Scenario: Search supports other languages              # features/google_search.feature:53
+    Given I open the Google home page                    # features/steps/navigation_steps.py:14
+    When I search for "привет мир"                       # features/steps/search_steps.py:16
+    Then at least 3 organic results should be shown      # features/steps/search_steps.py:32
+      Assertion Failed: Google results container never rendered.
+
+    And the first organic result should contain "привет" # None
+
+  @variant3
+  Scenario: Google search is not case sensitive                      # features/google_search.feature:59
+    Given I open the Google home page                                # features/steps/navigation_steps.py:14
+    When I search for "selenium testing"                             # features/steps/search_steps.py:16
+    And I store the first organic result title as "baseline_case"    # features/steps/advanced_search_steps.py:94
+    And I search for "SELENIUM TESTING"                              # features/steps/search_steps.py:16
+    Then the first organic result title should match "baseline_case" # features/steps/advanced_search_steps.py:100
+      Traceback (most recent call last):
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/behave/model.py", line 1329, in run
+          match.run(runner.context)
+          ~~~~~~~~~^^^^^^^^^^^^^^^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/behave/matchers.py", line 98, in run
+          self.func(context, *args, **kwargs)
+          ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "features/steps/advanced_search_steps.py", line 104, in step_compare_first_result
+          titles = _load_first_result_element(context)
+        File "features/steps/advanced_search_steps.py", line 145, in _load_first_result_element
+          visible = [title for title in titles if title.is_displayed()]
+                                                  ~~~~~~~~~~~~~~~~~~^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/selenium/webdriver/remote/webelement.py", line 252, in is_displayed
+          return self.parent.execute_script(f"/* isDisplayed */return ({isDisplayed_js}).apply(null, arguments);", self)
+                 ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/selenium/webdriver/remote/webdriver.py", line 414, in execute_script
+          return self.execute(command, {"script": script, "args": converted_args})["value"]
+                 ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/selenium/webdriver/remote/webdriver.py", line 354, in execute
+          self.error_handler.check_response(response)
+          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^
+        File "/home/kali/Documents/CPP_Lab7/.venv/lib/python3.13/site-packages/selenium/webdriver/remote/errorhandler.py", line 229, in check_response
+          raise exception_class(message, screen, stacktrace)
+      selenium.common.exceptions.StaleElementReferenceException: Message: stale element reference: stale element not found
+        (Session info: chrome=140.0.7339.127); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#stale-element-reference-exception
+      Stacktrace:
+      #0 0x56043fab9fba <unknown>
+      #1 0x56043f53e6d0 <unknown>
+      #2 0x56043f551d4b <unknown>
+      #3 0x56043f550b12 <unknown>
+      #4 0x56043f545c79 <unknown>
+      #5 0x56043f545da5 <unknown>
+      #6 0x56043f543eaf <unknown>
+      #7 0x56043f547e9a <unknown>
+      #8 0x56043f5dcb3e <unknown>
+      #9 0x56043f5b5e32 <unknown>
+      #10 0x56043f5dbb54 <unknown>
+      #11 0x56043f5b5c03 <unknown>
+      #12 0x56043f5827a8 <unknown>
+      #13 0x56043f583421 <unknown>
+      #14 0x56043fa7eb28 <unknown>
+      #15 0x56043fa8287f <unknown>
+      #16 0x56043fa66c49 <unknown>
+      #17 0x56043fa83405 <unknown>
+      #18 0x56043fa4c4ff <unknown>
+      #19 0x56043faa7258 <unknown>
+      #20 0x56043faa7432 <unknown>
+      #21 0x56043fab8fa3 <unknown>
+      #22 0x7f6705ca1b7b <unknown>
+
+
+  @variant3
+  Scenario: Calculator service appears for arithmetic queries  # features/google_search.feature:66
+    Given I open the Google home page                          # features/steps/navigation_steps.py:14
+    When I search for "2+2"                                    # features/steps/search_steps.py:16
+    Then the calculator result should display "4"              # features/steps/advanced_search_steps.py:114
+
+  @variant3
+  Scenario: Currency converter appears for conversion queries  # features/google_search.feature:71
+    Given I open the Google home page                          # features/steps/navigation_steps.py:14
+    When I search for "100 usd to eur"                         # features/steps/search_steps.py:16
+    Then the currency converter widget should be visible       # features/steps/advanced_search_steps.py:127
+
